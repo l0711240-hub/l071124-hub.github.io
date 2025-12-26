@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>공유 약속 잡기 달력 2026</title>
+    <title>모 1월 2월 약속잡기</title>
     <style>
         * {
             margin: 0;
@@ -452,16 +452,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>📅 공유 약속 잡기 달력 2026</h1>
-        <div class="subtitle">🌐 실시간으로 모두가 함께 보고 수정할 수 있습니다</div>
-        
-        <div class="setup-notice">
-            <h3>🔧 Firebase 설정이 필요합니다</h3>
-            <p>1. <a href="https://console.firebase.google.com/" target="_blank">Firebase Console</a>에서 새 프로젝트 생성</p>
-            <p>2. Realtime Database 생성 (테스트 모드로 시작)</p>
-            <p>3. 프로젝트 설정에서 웹 앱 추가 후 config 정보 복사</p>
-            <p>4. 아래 코드의 <code>firebaseConfig</code>를 본인의 설정으로 교체</p>
-        </div>
+        <h1>1월 2월 일정 공유달력</h1>
+        <div class="subtitle">🌐 실시간 수정 가능</div>
 
         <div id="connectionStatus" class="connection-status disconnected">
             🔴 서버 연결 중...
@@ -619,7 +611,7 @@
             const status = document.getElementById('connectionStatus');
             if (connected) {
                 status.className = 'connection-status connected';
-                status.textContent = '🟢 실시간 연결됨';
+                status.textContent = '🟢 서버에 실시간 연결됨';
             } else {
                 status.className = 'connection-status disconnected';
                 status.textContent = '🔴 연결 안됨 - Firebase 설정 필요';
