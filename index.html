@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>공유 약속 잡기 달력 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .connection-status {
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .connection-status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .connection-status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .user-setup {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .user-input-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        input[type="color"] {
+            width: 50px;
+            height: 40px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button {
+            padding: 10px 25px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        button.danger {
+            background: #e74c3c;
+        }
+
+        button.danger:hover {
+            background: #c0392b;
+        }
+
+        .participants {
+            margin-top: 20px;
+        }
+
+        .participant-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .participant-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .participant-tag:hover {
+            transform: translateY(-2px);
+        }
+
+        .participant-tag.active {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+            transform: scale(1.05);
+        }
+
+        .participant-tag .remove {
+            cursor: pointer;
+            font-weight: bold;
+            opacity: 0.8;
+            margin-left: 5px;
+        }
+
+        .participant-tag .remove:hover {
+            opacity: 1;
+        }
+
+        .current-user {
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px dashed #667eea;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .current-user strong {
+            color: #667eea;
+            font-size: 1.1em;
+        }
+
+        .instructions {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .instructions p {
+            margin: 5px 0;
+            color: #856404;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .legend-box {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+            flex-shrink: 0;
+        }
+
+        .legend-box.available {
+            background: #2ecc71;
+            border-color: #27ae60;
+        }
+
+        .legend-box.unavailable {
+            background: #e74c3c;
+            border-color: #c0392b;
+        }
+
+        .legend-box.partial {
+            background: linear-gradient(135deg, #f39c12 50%, #e67e22 50%);
+            border-color: #d68910;
+        }
+
+        .calendars {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .calendar {
+            background: #fff;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .calendar-header {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .weekday {
+            text-align: center;
+            font-weight: bold;
+            color: #666;
+            padding: 10px 0;
+            font-size: 0.9em;
+        }
+
+        .weekday.sunday {
+            color: #e74c3c;
+        }
+
+        .weekday.saturday {
+            color: #3498db;
+        }
+
+        .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            background: white;
+            padding: 3px;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .day:hover:not(.empty) {
+            border-color: #667eea;
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+        .day.empty {
+            cursor: default;
+            border: none;
+        }
+
+        .day.empty:hover {
+            transform: none;
+        }
+
+        .day.all-available {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            border-color: #27ae60;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
+        }
+
+        .day.all-available .day-number {
+            color: white;
+        }
+
+        .day.all-unavailable {
+            background: #f8f9fa;
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .day.all-unavailable:hover {
+            transform: none;
+            border-color: #eee;
+        }
+
+        .day-number {
+            font-size: 1em;
+            font-weight: 600;
+            margin-bottom: 2px;
+            line-height: 1;
+        }
+
+        .day.sunday .day-number {
+            color: #e74c3c;
+        }
+
+        .day.saturday .day-number {
+            color: #3498db;
+        }
+
+        .day.all-available.sunday .day-number,
+        .day.all-available.saturday .day-number {
+            color: white;
+        }
+
+        .day-info {
+            font-size: 0.65em;
+            text-align: center;
+            margin-top: 1px;
+            line-height: 1.1;
+            white-space: nowrap;
+        }
+
+        .day-markers {
+            display: flex;
+            gap: 2px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 100%;
+            margin-top: 2px;
+        }
+
+        .marker {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.5);
+            flex-shrink: 0;
+        }
+
+        .best-dates {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            border-radius: 15px;
+            color: white;
+        }
+
+        .best-dates h2 {
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .best-date-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .best-date-item {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .reset-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px dashed #ddd;
+            text-align: center;
+        }
+
+        .setup-notice {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .setup-notice h3 {
+            color: #1976D2;
+            margin-bottom: 10px;
+        }
+
+        .setup-notice p {
+            margin: 5px 0;
+            color: #1565C0;
+        }
+
+        .setup-notice code {
+            background: #fff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #d32f2f;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📅 공유 약속 잡기 달력 2026</h1>
+        <div class="subtitle">🌐 실시간으로 모두가 함께 보고 수정할 수 있습니다</div>
+        
+        <div class="setup-notice">
+            <h3>🔧 Firebase 설정이 필요합니다</h3>
+            <p>1. <a href="https://console.firebase.google.com/" target="_blank">Firebase Console</a>에서 새 프로젝트 생성</p>
+            <p>2. Realtime Database 생성 (테스트 모드로 시작)</p>
+            <p>3. 프로젝트 설정에서 웹 앱 추가 후 config 정보 복사</p>
+            <p>4. 아래 코드의 <code>firebaseConfig</code>를 본인의 설정으로 교체</p>
+        </div>
+
+        <div id="connectionStatus" class="connection-status disconnected">
+            🔴 서버 연결 중...
+        </div>
+        
+        <div class="instructions">
+            <p>💡 <strong>사용방법:</strong></p>
+            <p>1. 이름과 색상을 선택하고 '참가하기' 버튼을 누르세요</p>
+            <p>2. 달력에서 <strong>안 되는 날짜</strong>를 클릭하여 표시하세요 (여러 개 선택 가능)</p>
+            <p>3. <strong>초록색</strong>으로 표시된 날짜는 모두가 가능한 최적의 날짜입니다!</p>
+            <p>4. 모든 변경사항은 실시간으로 다른 기기의 사람들에게 공유됩니다</p>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-box available"></div>
+                <span>모두 가능한 날</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box partial"></div>
+                <span>일부 불가능</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box unavailable"></div>
+                <span>모두 불가능</span>
+            </div>
+        </div>
+
+        <div class="user-setup">
+            <div class="user-input-group">
+                <div class="input-wrapper">
+                    <label>이름:</label>
+                    <input type="text" id="userName" placeholder="이름을 입력하세요">
+                </div>
+                <div class="input-wrapper">
+                    <label>색상:</label>
+                    <input type="color" id="userColor" value="#667eea">
+                </div>
+                <button onclick="addParticipant()">참가하기</button>
+            </div>
+            
+            <div class="participants">
+                <p style="font-weight: 600; margin-bottom: 10px;">참가자 목록 (<span id="participantCount">0</span>명):</p>
+                <div class="participant-list" id="participants"></div>
+            </div>
+
+            <div class="reset-section">
+                <button class="danger" onclick="resetCalendar()">🗑️ 전체 초기화</button>
+                <p style="font-size: 0.85em; color: #666; margin-top: 5px;">모든 참가자와 일정을 삭제합니다</p>
+            </div>
+        </div>
+
+        <div id="currentUserDisplay" class="current-user" style="display: none;">
+            현재 선택 중: <strong id="currentUserName"></strong> (안 되는 날을 클릭하세요)
+        </div>
+
+        <div class="calendars">
+            <div class="calendar">
+                <div class="calendar-header">2026년 1월</div>
+                <div class="weekdays">
+                    <div class="weekday sunday">일</div>
+                    <div class="weekday">월</div>
+                    <div class="weekday">화</div>
+                    <div class="weekday">수</div>
+                    <div class="weekday">목</div>
+                    <div class="weekday">금</div>
+                    <div class="weekday saturday">토</div>
+                </div>
+                <div class="days" id="january"></div>
+            </div>
+
+            <div class="calendar">
+                <div class="calendar-header">2026년 2월</div>
+                <div class="weekdays">
+                    <div class="weekday sunday">일</div>
+                    <div class="weekday">월</div>
+                    <div class="weekday">화</div>
+                    <div class="weekday">수</div>
+                    <div class="weekday">목</div>
+                    <div class="weekday">금</div>
+                    <div class="weekday saturday">토</div>
+                </div>
+                <div class="days" id="february"></div>
+            </div>
+        </div>
+
+        <div class="best-dates" id="bestDatesSection">
+            <h2>🎯 모두 가능한 최적의 날짜</h2>
+            <div id="bestDates">
+                <p>참가자를 추가하고 안 되는 날짜를 선택하세요.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Firebase 설정 - 여기를 본인의 Firebase config로 교체하세요!
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkykB9vp9MpELRJ8XnJ-CVNZbEjXPYFnY",
+            authDomain: "share-calander.firebaseapp.com",
+            databaseURL: "https://share-calander-default-rtdb.firebaseio.com",
+            projectId: "share-calander",
+            storageBucket: "share-calander.firebasestorage.app",
+            messagingSenderId: "1002462539122",
+            appId: "1:1002462539122:web:5a43f6c43b2d600f7041eb"
+        };
+
+        let app, database;
+        let participants = [];
+        let currentParticipant = null;
+        let unavailability = {};
+        let isConnected = false;
+
+        // Firebase 초기화
+        try {
+            app = initializeApp(firebaseConfig);
+            database = getDatabase(app);
+            isConnected = true;
+            updateConnectionStatus(true);
+            
+            // 실시간 데이터 동기화
+            const participantsRef = ref(database, 'participants');
+            const unavailabilityRef = ref(database, 'unavailability');
+
+            onValue(participantsRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    participants = data;
+                    updateParticipantsDisplay();
+                    renderCalendars();
+                    updateBestDates();
+                }
+            });
+
+            onValue(unavailabilityRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    unavailability = data;
+                    updateParticipantsDisplay();
+                    renderCalendars();
+                    updateBestDates();
+                }
+            });
+
+        } catch (error) {
+            console.error('Firebase 초기화 실패:', error);
+            updateConnectionStatus(false);
+            alert('Firebase 설정이 필요합니다. 코드의 firebaseConfig를 확인해주세요.');
+        }
+
+        function updateConnectionStatus(connected) {
+            const status = document.getElementById('connectionStatus');
+            if (connected) {
+                status.className = 'connection-status connected';
+                status.textContent = '🟢 실시간 연결됨';
+            } else {
+                status.className = 'connection-status disconnected';
+                status.textContent = '🔴 연결 안됨 - Firebase 설정 필요';
+            }
+        }
+
+        async function saveParticipants() {
+            if (!isConnected) return;
+            const participantsRef = ref(database, 'participants');
+            await set(participantsRef, participants);
+        }
+
+        async function saveUnavailability() {
+            if (!isConnected) return;
+            const unavailabilityRef = ref(database, 'unavailability');
+            await set(unavailabilityRef, unavailability);
+        }
+
+        window.addParticipant = async function() {
+            const name = document.getElementById('userName').value.trim();
+            const color = document.getElementById('userColor').value;
+
+            if (!name) {
+                alert('이름을 입력해주세요!');
+                return;
+            }
+
+            if (participants.some(p => p.name === name)) {
+                alert('이미 존재하는 이름입니다!');
+                return;
+            }
+
+            const participant = { name, color };
+            participants.push(participant);
+            currentParticipant = participant;
+            
+            if (!unavailability[name]) {
+                unavailability[name] = [];
+            }
+
+            await saveParticipants();
+            await saveUnavailability();
+            
+            document.getElementById('userName').value = '';
+            document.getElementById('userColor').value = '#' + Math.floor(Math.random()*16777215).toString(16);
+        }
+
+        function updateParticipantsDisplay() {
+            const container = document.getElementById('participants');
+            const countDisplay = document.getElementById('participantCount');
+            countDisplay.textContent = participants.length;
+            
+            container.innerHTML = '';
+            
+            if (participants.length === 0) {
+                container.innerHTML = '<p style="color: #999; font-style: italic;">아직 참가자가 없습니다.</p>';
+                return;
+            }
+
+            participants.forEach(p => {
+                const tag = document.createElement('div');
+                tag.className = 'participant-tag';
+                if (currentParticipant && currentParticipant.name === p.name) {
+                    tag.classList.add('active');
+                }
+                tag.style.backgroundColor = p.color;
+                
+                const unavailableCount = unavailability[p.name] ? unavailability[p.name].length : 0;
+                
+                tag.innerHTML = `
+                    <span>${p.name} (${unavailableCount}일 불가)</span>
+                    <span class="remove" onclick="removeParticipant('${p.name}')">×</span>
+                `;
+                tag.onclick = (e) => {
+                    if (!e.target.classList.contains('remove')) {
+                        selectParticipant(p);
+                    }
+                };
+                container.appendChild(tag);
+            });
+
+            updateCurrentUserDisplay();
+        }
+
+        function selectParticipant(participant) {
+            currentParticipant = participant;
+            updateParticipantsDisplay();
+        }
+
+        function updateCurrentUserDisplay() {
+            const display = document.getElementById('currentUserDisplay');
+            const nameDisplay = document.getElementById('currentUserName');
+            
+            if (currentParticipant) {
+                display.style.display = 'block';
+                nameDisplay.textContent = currentParticipant.name;
+                nameDisplay.style.color = currentParticipant.color;
+            } else {
+                display.style.display = 'none';
+            }
+        }
+
+        window.removeParticipant = async function(name) {
+            if (!confirm(`${name}님을 삭제하시겠습니까?`)) {
+                return;
+            }
+
+            participants = participants.filter(p => p.name !== name);
+            delete unavailability[name];
+
+            if (currentParticipant && currentParticipant.name === name) {
+                currentParticipant = participants[0] || null;
+            }
+
+            await saveParticipants();
+            await saveUnavailability();
+        }
+
+        window.toggleDate = async function(year, month, day) {
+            if (!currentParticipant) {
+                alert('먼저 참가자를 선택하거나 추가해주세요!');
+                return;
+            }
+
+            const dateKey = `${year}-${month}-${day}`;
+            
+            if (!unavailability[currentParticipant.name]) {
+                unavailability[currentParticipant.name] = [];
+            }
+
+            const index = unavailability[currentParticipant.name].indexOf(dateKey);
+            
+            if (index > -1) {
+                unavailability[currentParticipant.name].splice(index, 1);
+            } else {
+                unavailability[currentParticipant.name].push(dateKey);
+            }
+
+            await saveUnavailability();
+        }
+
+        function getUnavailableParticipants(dateKey) {
+            const unavailableList = [];
+            participants.forEach(p => {
+                if (unavailability[p.name] && unavailability[p.name].includes(dateKey)) {
+                    unavailableList.push(p);
+                }
+            });
+            return unavailableList;
+        }
+
+        function renderCalendars() {
+            renderMonth(2026, 1, 'january');
+            renderMonth(2026, 2, 'february');
+        }
+
+        function renderMonth(year, month, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            const firstDay = new Date(year, month - 1, 1).getDay();
+            const daysInMonth = new Date(year, month, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'day empty';
+                container.appendChild(emptyDay);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayDiv = document.createElement('div');
+                const dayOfWeek = new Date(year, month - 1, day).getDay();
+                
+                dayDiv.className = 'day';
+                if (dayOfWeek === 0) dayDiv.classList.add('sunday');
+                if (dayOfWeek === 6) dayDiv.classList.add('saturday');
+                
+                const dateKey = `${year}-${month}-${day}`;
+                const dayNumber = document.createElement('div');
+                dayNumber.className = 'day-number';
+                dayNumber.textContent = day;
+                dayDiv.appendChild(dayNumber);
+
+                const unavailableList = getUnavailableParticipants(dateKey);
+                
+                if (participants.length > 0) {
+                    if (unavailableList.length === 0) {
+                        dayDiv.classList.add('all-available');
+                        const info = document.createElement('div');
+                        info.className = 'day-info';
+                        info.textContent = '✓ 모두';
+                        dayDiv.appendChild(info);
+                    } else if (unavailableList.length === participants.length) {
+                        dayDiv.classList.add('all-unavailable');
+                        const info = document.createElement('div');
+                        info.className = 'day-info';
+                        info.textContent = '✗ 모두';
+                        dayDiv.appendChild(info);
+                    } else {
+                        const markers = document.createElement('div');
+                        markers.className = 'day-markers';
+                        unavailableList.forEach(p => {
+                            const marker = document.createElement('div');
+                            marker.className = 'marker';
+                            marker.style.backgroundColor = p.color;
+                            marker.title = `${p.name} 불가`;
+                            markers.appendChild(marker);
+                        });
+                        dayDiv.appendChild(markers);
+                    }
+                }
+
+                dayDiv.onclick = () => {
+                    if (!dayDiv.classList.contains('all-unavailable') || 
+                        (currentParticipant && unavailability[currentParticipant.name] && 
+                         unavailability[currentParticipant.name].includes(dateKey))) {
+                        window.toggleDate(year, month, day);
+                    }
+                };
+
+                container.appendChild(dayDiv);
+            }
+        }
+
+        function updateBestDates() {
+            const content = document.getElementById('bestDates');
+            
+            if (participants.length === 0) {
+                content.innerHTML = '<p>참가자를 추가하고 안 되는 날짜를 선택하세요.</p>';
+                return;
+            }
+
+            const availableDates = [];
+            
+            for (let month = 1; month <= 2; month++) {
+                const daysInMonth = new Date(2026, month, 0).getDate();
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dateKey = `2026-${month}-${day}`;
+                    const unavailableList = getUnavailableParticipants(dateKey);
+                    if (unavailableList.length === 0) {
+                        availableDates.push({ month, day });
+                    }
+                }
+            }
+
+            if (availableDates.length === 0) {
+                content.innerHTML = '<p style="font-size: 1.1em;">😢 모두가 가능한 날짜가 없습니다. 일정을 조정해주세요!</p>';
+                return;
+            }
+
+            const listDiv = document.createElement('div');
+            listDiv.className = 'best-date-list';
+            
+            availableDates.forEach(date => {
+                const item = document.createElement('div');
+                item.className = 'best-date-item';
+                item.textContent = `${date.month}월 ${date.day}일`;
+                listDiv.appendChild(item);
+            });
+
+            content.innerHTML = `<p style="margin-bottom: 15px; font-size: 1.1em;">총 ${availableDates.length}일이 가능합니다! 🎉</p>`;
+            content.appendChild(listDiv);
+        }
+
+        window.resetCalendar = async function() {
+            if (!confirm('정말로 모든 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+                return;
+            }
+
+            if (!isConnected) {
+                alert('서버에 연결되지 않았습니다.');
+                return;
+            }
+
+            try {
+                const participantsRef = ref(database, 'participants');
+                const unavailabilityRef = ref(database, 'unavailability');
+                
+                await remove(participantsRef);
+                await remove(unavailabilityRef);
+                
+                participants = [];
+                currentParticipant = null;
+                unavailability = {};
+                
+                alert('모든 데이터가 삭제되었습니다.');
+            } catch (error) {
+                console.error('Error resetting calendar:', error);
+                alert('데이터 삭제 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 초기 렌더링
+        renderCalendars();
+    </script>
+</body>
+</html>
