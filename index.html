@@ -452,7 +452,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>1월 2월 일정 공유달력</h1>
+        <h1>4월 5월 일정 공유달력</h1>
         <div class="subtitle">🌐 실시간 수정 가능</div>
 
         <div id="connectionStatus" class="connection-status disconnected">
@@ -512,7 +512,7 @@
 
         <div class="calendars">
             <div class="calendar">
-                <div class="calendar-header">2026년 1월</div>
+                <div class="calendar-header">2026년 4월</div>
                 <div class="weekdays">
                     <div class="weekday sunday">일</div>
                     <div class="weekday">월</div>
@@ -522,11 +522,11 @@
                     <div class="weekday">금</div>
                     <div class="weekday saturday">토</div>
                 </div>
-                <div class="days" id="january"></div>
+                <div class="days" id="april"></div>
             </div>
 
             <div class="calendar">
-                <div class="calendar-header">2026년 2월</div>
+                <div class="calendar-header">2026년 5월</div>
                 <div class="weekdays">
                     <div class="weekday sunday">일</div>
                     <div class="weekday">월</div>
@@ -536,7 +536,7 @@
                     <div class="weekday">금</div>
                     <div class="weekday saturday">토</div>
                 </div>
-                <div class="days" id="february"></div>
+                <div class="days" id="may"></div>
             </div>
         </div>
 
@@ -764,8 +764,8 @@
         }
 
         function renderCalendars() {
-            renderMonth(2026, 1, 'january');
-            renderMonth(2026, 2, 'february');
+            renderMonth(2026, 4, 'april');
+            renderMonth(2026, 5, 'may');
         }
 
         function renderMonth(year, month, containerId) {
@@ -846,7 +846,7 @@
 
             const availableDates = [];
             
-            for (let month = 1; month <= 2; month++) {
+            for (let month = 4; month <= 5; month++) {
                 const daysInMonth = new Date(2026, month, 0).getDate();
                 for (let day = 1; day <= daysInMonth; day++) {
                     const dateKey = `2026-${month}-${day}`;
